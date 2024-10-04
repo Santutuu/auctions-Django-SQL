@@ -1,0 +1,87 @@
+
+
+.articulo {
+    display:flex;
+    
+    justify-content: space-between;
+    flex-direction: row;
+    border: 3px solid black;
+    border-radius: 10px;
+    margin-left: 400px;
+    margin-right: 400px;
+    height: 600px;
+
+    
+}
+
+.articulo img {
+    border-radius: 10px;
+    height: 557px;
+    width: 800px;
+    margin: 20px 0px 20px 20px;
+    
+    
+}
+
+.contenido1 {
+    
+    display:flex;
+    margin: 15px 15px 15px 0px;
+    padding: 15px;
+    justify-content: space-between;
+    flex-direction: column;
+    border: 1px solid black;
+    border-radius: 10px;
+    width: 400px;
+    height: 500px;
+    
+
+
+}
+
+.contenido2 {
+    
+    padding: 10px;
+}
+
+#titulo {
+    margin-left: 100px;
+}
+
+#descripcion {
+
+    font-size: large;
+    margin-bottom: 200px;
+
+}
+
+.precio {
+    font-size: larger;
+}
+
+#precio button {
+    background-color: yellow;
+
+
+}
+
+#ofertar {
+    border-radius: 10px;
+    padding-left: 20px;
+    width: 200px;
+}
+
+#ofertante {
+    
+    font-size: smaller;
+    margin-bottom: 10px;
+}
+
+#ofertante b {
+
+    color: rgb(218, 188, 19);
+}
+
+#listaSeguimiento {
+    margin-right: 50px;
+}

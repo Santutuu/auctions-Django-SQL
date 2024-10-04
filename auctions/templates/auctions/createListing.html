@@ -1,0 +1,44 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+
+{% block head %}
+    <link href="{% static 'auctions/publicar.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    
+    <form action="{% url 'create' %}" method="post">
+        {% csrf_token %}
+
+        <section class="entradas">
+
+            
+
+            <div class="form-group" id="titulo">
+                <label for="{{ form.titulo.id_for_label }}"><h3>{{ form.titulo.label }}</h3></label>
+                {{ form.titulo }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.descripcion.id_for_label }}"><h4>{{ form.descripcion.label }}</h4></label>
+                {{ form.descripcion }}
+            </div>
+
+            <div class="form-group" id="imagen">
+                <label for="{{ form.imagen.id_for_label }}"><h4>{{ form.imagen.label }}</h4></label>
+                {{ form.imagen }}
+            </div>
+
+
+            
+            <div class="form-group">
+                <label for="{{ form.oferta_inicial.id_for_label }}"><h3>{{ form.ofertaInicial.label }}</h3></label>
+                {{ form.ofertaInicial }}
+            </div>
+
+            <button type="submit" class="botonsito">publicar</button>
+        </section>
+
+    </form>
+
+{% endblock %}

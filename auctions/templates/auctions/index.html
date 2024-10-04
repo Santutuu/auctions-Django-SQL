@@ -1,0 +1,45 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+
+{% block head %}
+    <link href="{% static 'auctions/index.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+
+    <section class="subastas">
+        
+            {% for subasta in subastas %}
+                <article class="articulo">
+                   
+                    <div id="titulo">
+                        <h2>{{subasta.titulo}}</h2>
+                    </div>
+                    
+                    <a class="link" href="{% url 'articleBid' subasta.id %}">
+
+                        <div class="contenido">
+
+                            <div class="imagen">
+                                <img src="{{ subasta.imagen }}">
+                            </div>
+                            
+                            <div class="descripcion">
+                                <p>{{subasta.descripcion}}</p>
+                            </div>
+
+                            
+                            <div class="oferta"> 
+                                <h5>Oferta inicial: {{subasta.ofertaInicial}}</h5>
+                            </div>
+                        
+                        </div>
+                    </a>
+                </article>
+            {% endfor %}
+        
+
+    
+    </section>
+
+{% endblock %}

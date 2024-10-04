@@ -1,0 +1,40 @@
+
+.entradas {
+    width: 200px;
+    margin: 100px;
+    
+}
+.entradas input {
+    width: 100px;
+}
+
+.form-group input {
+    margin-bottom: 40px;
+    padding-left: 20px;
+}
+
+
+#titulo input {
+    width: 300px;
+    font-size: larger;
+
+}
+#imagen input {
+
+    width: 300px;
+}
+
+
+.form-group input, textarea {
+    border: 2px solid black;
+    border-radius: 10px;
+
+}
+
+*{
+    background-color: white
+}
+
+.botonsito {
+    background-color: yellow;
+ }

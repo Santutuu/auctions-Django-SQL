@@ -1,0 +1,70 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+
+{% block head %}
+    <link href="{% static 'auctions/articleBid.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+
+{% if message %}
+    <script lang="javascript">
+        window.alert("{{ message }}");
+    </script>
+{% endif %}
+
+
+    <section class="articulo">
+        <div class="iamgen">
+            <img src="{{articulo.imagen}}">
+        </div>
+        
+        <div class="contenido2">
+        <div class="contenido1">
+
+            <div id="titulo">
+                <h1>{{articulo.titulo}}</h1>
+            </div>
+
+            
+
+            <div id="descripcion">
+                {{articulo.descripcion}}
+                
+            </div>
+
+            <div id="precio">
+                
+                <form method="post">
+                    {% csrf_token %}
+                
+                    <h2>{{oferta}}$</h2>
+                    <div id="ofertante">
+                        Ofertante actual: <b>{{ofertante}}</b>
+                    </div>
+                    
+                    <input type="number" id="ofertar" name="ofertar" value="{{ oferta|add:10 }}">
+                
+                    
+                    <button type="submit">Ofertar</button>
+
+                </form>
+            </div>
+
+            
+
+        </div>
+
+        <div id="listaSeguimiento">
+
+        
+
+            <button type="submit">Añadir a la lista de seguimiento</button>
+        </div>
+        </div>
+
+    </div>
+ 
+    </section>
+
+{% endblock %}
