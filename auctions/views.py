@@ -83,7 +83,7 @@ def createListing(request):
         form = Crear(request.POST)  # chequea toda la data que se subio en el form y la guarda en la variable form 
 
         if form.is_valid():
-            titulo = form.cleaned_data["titulo"]     #accede y guarda a la variable titulo dentro del form
+            titulo = form["titulo"]    
             descripcion = form.cleaned_data["descripcion"] 
             imagen = form.cleaned_data["imagen"] 
             oferta = form.cleaned_data["ofertaInicial"] 
@@ -101,11 +101,7 @@ def createListing(request):
     else:
 
         form = Crear() 
-
-        
-   
-
-    return render (request, "auctions/createListing.html",
+        return render (request, "auctions/createListing.html",
                    {"form": form})
     
 
@@ -159,9 +155,7 @@ def articleBid(request, subasta_id):
     
 
 
-"""problemas //
 
-como accedo al id del usuario"""
 
 
       

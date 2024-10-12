@@ -1,6 +1,7 @@
 from django import forms
 
 
+
 class Crear(forms.Form):
      
     titulo = forms.CharField(
@@ -38,6 +39,23 @@ class Crear(forms.Form):
             'name': 'ofertaInicial'
         })
     )
+
+
+class ofertar (forms.Form):
+    oferta = forms.DecimalField()
+
+    """def clean_oferta(self):
+
+        oferta = self.cleaned_data.get('oferta')
+        if "@" in nombre:
+            raise forms.ValidationError("El nombre no puede contener un '@'.")
+        return nombre
+
+    <input type="number" id="ofertar" name="ofertar" value="{{ oferta|add:10 }}">
+    """
+
+
+
 
     
 

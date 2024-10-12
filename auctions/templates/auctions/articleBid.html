@@ -35,13 +35,15 @@
 
             <div id="precio">
                 
-                <form method="post">
-                    {% csrf_token %}
+              
                 
                     <h2>{{oferta}}$</h2>
                     <div id="ofertante">
                         Ofertante actual: <b>{{ofertante}}</b>
                     </div>
+                    
+                <form method="post">
+                    {% csrf_token %}
                     
                     <input type="number" id="ofertar" name="ofertar" value="{{ oferta|add:10 }}">
                 
@@ -55,12 +57,14 @@
 
         </div>
 
-        <div id="listaSeguimiento">
+        <form method="post">
+            <div id="listaSeguimiento">
 
-        
+            
 
-            <button type="submit">Añadir a la lista de seguimiento</button>
-        </div>
+                <input type="button" name="listaSeguimiento">{{mensajeSeguimiento}}</button>
+            </div>
+        </form>
         </div>
 
     </div>
