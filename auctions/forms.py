@@ -42,7 +42,7 @@ class Crear(forms.Form):
 
 
 class ofertar (forms.Form):
-    oferta = forms.DecimalField()
+    oferta = forms.DecimalField(min_value=0)
 
     """def clean_oferta(self):
 
@@ -53,6 +53,8 @@ class ofertar (forms.Form):
 
     <input type="number" id="ofertar" name="ofertar" value="{{ oferta|add:10 }}">
     """
+
+
 
 
 

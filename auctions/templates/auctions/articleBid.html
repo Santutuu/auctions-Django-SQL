@@ -7,65 +7,78 @@
 
 {% block body %}
 
-{% if message %}
-    <script lang="javascript">
-        window.alert("{{ message }}");
-    </script>
-{% endif %}
 
 
     <section class="articulo">
-        <div class="iamgen">
+        <div class="imagen">
             <img src="{{articulo.imagen}}">
         </div>
         
         <div class="contenido2">
-        <div class="contenido1">
+            <div class="contenido1">
 
-            <div id="titulo">
-                <h1>{{articulo.titulo}}</h1>
-            </div>
+                <div id="titulo">
+                    <h1>{{articulo.titulo}}</h1>
+                </div>
 
-            
-
-            <div id="descripcion">
-                {{articulo.descripcion}}
                 
-            </div>
 
-            <div id="precio">
-                
-              
-                
-                    <h2>{{oferta}}$</h2>
-                    <div id="ofertante">
-                        Ofertante actual: <b>{{ofertante}}</b>
-                    </div>
+                <div id="descripcion">
+                    {{articulo.descripcion}}
                     
-                <form method="post">
-                    {% csrf_token %}
+                </div>
+
+                <div id="mensaje">
+                    {% if errorMessage %}
+                        {{ errorMessage }}
+                    {% endif %}
+                </div>
+
+
+                <div id="precio">
                     
-                    <input type="number" id="ofertar" name="ofertar" value="{{ oferta|add:10 }}">
                 
                     
-                    <button type="submit">Ofertar</button>
+                        <h2>{{oferta}}$</h2>
+                        <div id="ofertante">
+                            Ofertante actual: <b>{{ofertante}}</b>
+                        </div>
+                        
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <input type="number" id="ofertar" name="ofertar" value="{{ oferta|add:10 }}">
+                    
+                        
+                        <button type="submit"><strong>Ofertar</strong></button>
 
-                </form>
-            </div>
+                       
+                    </form>
+         </div>
 
             
 
         </div>
 
-        <form method="post">
-            <div id="listaSeguimiento">
+        <div class="botones">
 
-            
-
-                <input type="button" name="listaSeguimiento">{{mensajeSeguimiento}}</button>
-            </div>
+        <form method="post" action="{% url 'trackingList' articulo.id %}">
+            {% csrf_token %}
+                
+            <button type="submit" name="listaSeguimiento" id="listaSeguimiento"><strong>{{message}}</strong></button>
         </form>
+
+            {% if boton %}
+                <form method="post" action="{% url 'deleteView' articulo.id %}">
+                    {% csrf_token %}
+                    <button type="submit" name="eliminar" id="eliminar"><strong>Eliminar</strong> articulo</button>
+                </form>
+            {% endif %}
+            
+            
+
         </div>
+        
 
     </div>
  
