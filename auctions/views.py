@@ -6,9 +6,9 @@ from django.urls import reverse
 from django import forms
 from django.contrib import messages
 
-from . forms import Crear
+from . forms import Crear, Comentarios
 import time
-from . models import Subastas, Oferta   
+from . models import Subastas, Oferta, SeguimientoSubasta
 
 
 from .models import User
@@ -83,7 +83,7 @@ def createListing(request):
         form = Crear(request.POST)  # chequea toda la data que se subio en el form y la guarda en la variable form 
 
         if form.is_valid():
-            titulo = form["titulo"]    
+            titulo = form.cleaned_data["titulo"]    
             descripcion = form.cleaned_data["descripcion"] 
             imagen = form.cleaned_data["imagen"] 
             oferta = form.cleaned_data["ofertaInicial"] 
@@ -107,23 +107,27 @@ def createListing(request):
 
 
 def articleBid(request, subasta_id):
-
-    nuevo_oferta=None
+    nuevo_oferta = None
     boton = False
-    message="Añadir a la lista de seguimiento"
+    message = None  # Inicializar message
 
+    # Manejar mensajes flash
     if messages.get_messages(request):
         for msg in messages.get_messages(request):
             message = msg  # Sobrescribir el mensaje por defecto si hay uno flash
-    
+
+    form = Comentarios(request.POST)
+
+    if form.is_valid():
+            comentarios = form.cleaned_data["comentarios"]  
+
     articulo = Subastas.objects.get(pk=subasta_id)
-    
-    oferta = Oferta.objects.filter(articulo=articulo).order_by('-ofertaActual').first() #Busca la oferta mas reciente en la base de datos
+    oferta = Oferta.objects.filter(articulo=articulo).order_by('-ofertaActual').first()  # Busca la oferta más reciente
 
     if articulo.creador == request.user:
-        boton=True
+        boton = True
 
-    if oferta: #si encuentra que hubo alguna oferta, la guarda 
+    if oferta:
         ofertaActual = oferta.ofertaActual
         ofertanteActual = oferta.ofertanteActual
     else:
@@ -131,52 +135,79 @@ def articleBid(request, subasta_id):
         ofertanteActual = "No hay ofertas"
 
     if request.method == "POST":
-            
-     
-            oferta = int (request.POST["ofertar"]) #Obtiene el valor ofertado
-            ofertante = request.user
-            
-            
-            if oferta >= (ofertaActual + 10):
-                
-                nuevo_oferta = Oferta(articulo=articulo, ofertaActual=oferta, ofertanteActual=ofertante ) #guarda los datos de la oferta en la BD
-                nuevo_oferta.save()
+        
+        oferta = int(request.POST["ofertar"])  # Obtiene el valor ofertado
+        ofertante = request.user
+        
+        if oferta >= (ofertaActual + 10):
+            nuevo_oferta = Oferta(articulo=articulo, ofertaActual=oferta, ofertanteActual=ofertante)
+            nuevo_oferta.save()
 
-                #guarda la nueva oferta y ofertante
-                ofertaActual = nuevo_oferta.ofertaActual 
-                ofertanteActual = nuevo_oferta.ofertanteActual 
-                
-                
-            else:
-                
-                return render (request, "auctions/articleBid.html", {
+            # Guarda la nueva oferta y ofertante
+            ofertaActual = nuevo_oferta.ofertaActual 
+            ofertanteActual = nuevo_oferta.ofertanteActual 
+            
+            messages.info(request, "Tu oferta ha sido registrada exitosamente.")
+            return redirect('articleBid', subasta_id=subasta_id)  # Redirigir a la misma página
+
+        else:
+            return render(request, "auctions/articleBid.html", {
                 "oferta": ofertaActual,
                 "articulo": articulo,
                 "ofertante": ofertanteActual,
-                "errorMessage": "La oferta debe ser al menos $10 mayor a la anterior",
-                "boton": boton
-                
-                })
+                "errorMessage": "La oferta debe ser al menos $10 mayor a la anterior.",
+                "boton": boton,
+                "form": form
+            })
 
 
     return render(request, "auctions/articleBid.html", {
-
         "articulo": articulo,
         "oferta": ofertaActual,
         "ofertante": ofertanteActual,
-        "message": message,
-        "boton": boton
-        })
+        "message": message if message else "Añadir a lista de seguimiento",
+        "boton": boton, 
+        "form": form
+    })
+
     
 
 
 def trackingList(request, subasta_id):
-    articulo = Subastas.objects.get(pk=subasta_id)
+    nuevo_seguimiento = None
+    usuario= request.user #guarde el id del usuario
+    subasta = Subastas.objects.get(pk=subasta_id)
+
     if request.method == "POST":
-        message = "Remover de lista de seguimiento"
-        messages.info(request, message)  # Enviar el mensaje flash
-    
+
+        try:
+            seguimiento = SeguimientoSubasta.objects.get(user=usuario, subasta=subasta) #Comprueba si el articulo esta en lista de seguimiento
+
+            
+            if (seguimiento.esta_seguido == True):
+                message = "Remover de lista de seguimiento"
+                seguimiento.esta_seguido = False
+                messages.info(request, message)
+
+            else:
+
+                message = "Añadir a lista de seguimiento" 
+                seguimiento.esta_seguido = True
+            
+            seguimiento.save()    
+            messages.info(request, message) #Enviar el mensaje flash
+                
+        except SeguimientoSubasta.DoesNotExist:
+
+            seguimiento = SeguimientoSubasta(user=usuario, subasta=subasta, esta_seguido=True) #Sino esta, lo crea
+            seguimiento.save()
+            messages.info(request, "Remover de la lista de segumiento")
+            
+
+
     return redirect('articleBid', subasta_id=subasta_id)
+
+        
 
 
 def deleteView (request, subasta_id):
@@ -186,6 +217,22 @@ def deleteView (request, subasta_id):
         return redirect('index')
      
      return redirect('articleBid', subasta_id=subasta_id)
+
+
+def bidComments(request, subasta_id):
+
+    form = Comentarios(request.POST)
+
+   
+
+ 
+       
+            
+
+
+
+     
+
          
 
 

@@ -6,6 +6,8 @@ class User(AbstractUser):
     email = models.EmailField(max_length=50)
     password = models.CharField(max_length=50)
     
+    listaSeguimiento = models.ManyToManyField('Subastas', through='SeguimientoSubasta')
+    
 
     
 class Subastas(models.Model):
@@ -20,17 +22,26 @@ class Subastas(models.Model):
         return f"{self.titulo} || oferta inicial: {self.ofertaInicial}::{self.descripcion}"
     
 
+class SeguimientoSubasta(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    subasta = models.ForeignKey(Subastas, on_delete=models.CASCADE)
+    esta_seguido = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('user', 'subasta')
+
 class Oferta(models.Model):
-    
-   
     articulo = models.ForeignKey(Subastas, on_delete=models.CASCADE, related_name="articulo")
     ofertaActual = models.IntegerField()
-
     ofertanteActual = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ofertante")
 
-    
+  
 
     def __str__(self):
         return f"Articulo: {self.articulo} || oferta actual: {self.ofertaActual}. Ofertante: {self.ofertanteActual}"
+
+
+
+
 
    

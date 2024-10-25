@@ -53,10 +53,11 @@
 #descripcion {
 
     font-size: large;
-    margin-bottom: 200px;
-
 }
 
+#comentarios {
+   width: 300px;
+}
 .precio {
     font-size: larger;
 }

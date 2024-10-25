@@ -56,7 +56,16 @@ class ofertar (forms.Form):
 
 
 
-
+class Comentarios(forms.Form):
+    comentarios = forms.CharField(
+        
+        widget=forms.Textarea(attrs={
+            'rows': 6,
+            'cols': 45,
+            'name': 'comentarios',
+            'placeholder': "Aniadir un comentario"
+        })
+    )
 
 
     

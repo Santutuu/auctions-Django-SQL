@@ -28,6 +28,10 @@
                     
                 </div>
 
+                <div id="comentarios">
+                    {{form.comentarios}}
+                </div>
+
                 <div id="mensaje">
                     {% if errorMessage %}
                         {{ errorMessage }}
@@ -61,12 +65,13 @@
         </div>
 
         <div class="botones">
-
-        <form method="post" action="{% url 'trackingList' articulo.id %}">
-            {% csrf_token %}
+            {% if not boton %}
+                <form method="post" action="{% url 'trackingList' articulo.id %}">
+                {% csrf_token %}
                 
-            <button type="submit" name="listaSeguimiento" id="listaSeguimiento"><strong>{{message}}</strong></button>
-        </form>
+                <button type="submit" name="listaSeguimiento" id="listaSeguimiento"><strong>{{message}}</strong></button>
+                </form>
+            {% endif %}
 
             {% if boton %}
                 <form method="post" action="{% url 'deleteView' articulo.id %}">
