@@ -8,7 +8,7 @@ from django.contrib import messages
 
 from . forms import Crear, Comentarios
 import time
-from . models import Subastas, Oferta, SeguimientoSubasta
+from . models import Subastas, Oferta, SeguimientoSubasta, Comentarios
 
 
 from .models import User
@@ -106,8 +106,25 @@ def createListing(request):
     
 
 
+
+def bidLogic(_articulo, _ofertante, _oferta, _ofertaActual):
+
+    if _oferta >= (_ofertaActual + 10):
+            nuevo_oferta = Oferta(articulo=_articulo, ofertaActual=_oferta, ofertanteActual=_ofertante)
+            nuevo_oferta.save()
+
+            # Guarda la nueva oferta y ofertante
+            ofertaActual = nuevo_oferta.ofertaActual 
+            ofertanteActual = nuevo_oferta.ofertanteActual
+
+            return nuevo_oferta
+    return None
+
+
+
 def articleBid(request, subasta_id):
     nuevo_oferta = None
+    nuevo_comentario = None
     boton = False
     message = None  # Inicializar message
 
@@ -118,9 +135,7 @@ def articleBid(request, subasta_id):
 
     form = Comentarios(request.POST)
 
-    if form.is_valid():
-            comentarios = form.cleaned_data["comentarios"]  
-
+    
     articulo = Subastas.objects.get(pk=subasta_id)
     oferta = Oferta.objects.filter(articulo=articulo).order_by('-ofertaActual').first()  # Busca la oferta más reciente
 
@@ -139,18 +154,11 @@ def articleBid(request, subasta_id):
         oferta = int(request.POST["ofertar"])  # Obtiene el valor ofertado
         ofertante = request.user
         
-        if oferta >= (ofertaActual + 10):
-            nuevo_oferta = Oferta(articulo=articulo, ofertaActual=oferta, ofertanteActual=ofertante)
-            nuevo_oferta.save()
+        if bidLogic(articulo, request.user, oferta, ofertaActual): # valida que la oferta sea 10$ >
+            return redirect('articleBid', subasta_id=subasta_id)  # Redirige a la misma página
 
-            # Guarda la nueva oferta y ofertante
-            ofertaActual = nuevo_oferta.ofertaActual 
-            ofertanteActual = nuevo_oferta.ofertanteActual 
-            
-            messages.info(request, "Tu oferta ha sido registrada exitosamente.")
-            return redirect('articleBid', subasta_id=subasta_id)  # Redirigir a la misma página
-
-        else:
+        else: 
+            #muestra mensaje de error
             return render(request, "auctions/articleBid.html", {
                 "oferta": ofertaActual,
                 "articulo": articulo,
@@ -170,6 +178,14 @@ def articleBid(request, subasta_id):
         "form": form
     })
 
+
+def comments(request, subasta_id):
+    usuario= request.user #guarde el id del usuario
+    subasta = Subastas.objects.get(pk=subasta_id)
+    if request.method == "POST":
+        """if form.is_valid():
+            comentarios = form.cleaned_data["comentarios"]
+            nuevo_comentario = Comentarios(nombre=usuario, articulo=subasta, contenido=comentarios)"""
     
 
 
@@ -219,9 +235,7 @@ def deleteView (request, subasta_id):
      return redirect('articleBid', subasta_id=subasta_id)
 
 
-def bidComments(request, subasta_id):
 
-    form = Comentarios(request.POST)
 
    
 

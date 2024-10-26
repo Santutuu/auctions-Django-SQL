@@ -22,6 +22,13 @@ class Subastas(models.Model):
         return f"{self.titulo} || oferta inicial: {self.ofertaInicial}::{self.descripcion}"
     
 
+
+class Comentarios(models.Model):
+
+    nombre= models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    articulo=models.ForeignKey(Subastas, on_delete=models.CASCADE)
+    contenido=models.CharField(max_length=300)
+
 class SeguimientoSubasta(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     subasta = models.ForeignKey(Subastas, on_delete=models.CASCADE)
