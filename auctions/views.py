@@ -6,9 +6,9 @@ from django.urls import reverse
 from django import forms
 from django.contrib import messages
 
-from . forms import Crear, Comentarios
-import time
-from . models import Subastas, Oferta, SeguimientoSubasta, Comentarios
+from . forms import Crear, ComentariosForm
+
+from . models import Subastas, Oferta, SeguimientoSubasta, User, Comentarios
 
 
 from .models import User
@@ -133,9 +133,8 @@ def articleBid(request, subasta_id):
         for msg in messages.get_messages(request):
             message = msg  # Sobrescribir el mensaje por defecto si hay uno flash
 
-    form = Comentarios(request.POST)
+    form = ComentariosForm(request.POST)
 
-    
     articulo = Subastas.objects.get(pk=subasta_id)
     oferta = Oferta.objects.filter(articulo=articulo).order_by('-ofertaActual').first()  # Busca la oferta más reciente
 
@@ -148,6 +147,9 @@ def articleBid(request, subasta_id):
     else:
         ofertaActual = articulo.ofertaInicial
         ofertanteActual = "No hay ofertas"
+
+     # Obtener todos los comentarios relacionados con la subasta
+    comentariosList = Comentarios.objects.filter(articulo=articulo)[:3]
 
     if request.method == "POST":
         
@@ -165,7 +167,8 @@ def articleBid(request, subasta_id):
                 "ofertante": ofertanteActual,
                 "errorMessage": "La oferta debe ser al menos $10 mayor a la anterior.",
                 "boton": boton,
-                "form": form
+                "form": form,
+                "comentariosList": comentariosList
             })
 
 
@@ -175,18 +178,25 @@ def articleBid(request, subasta_id):
         "ofertante": ofertanteActual,
         "message": message if message else "Añadir a lista de seguimiento",
         "boton": boton, 
-        "form": form
+        "form": form,
+        "comentariosList": comentariosList
     })
 
 
 def comments(request, subasta_id):
-    usuario= request.user #guarde el id del usuario
-    subasta = Subastas.objects.get(pk=subasta_id)
-    if request.method == "POST":
-        """if form.is_valid():
-            comentarios = form.cleaned_data["comentarios"]
-            nuevo_comentario = Comentarios(nombre=usuario, articulo=subasta, contenido=comentarios)"""
     
+    subasta = Subastas.objects.get(pk=subasta_id)
+    
+    if request.method == "POST":
+
+        form = ComentariosForm(request.POST)
+        if form.is_valid():
+            comentario = form.cleaned_data["comentarios"]
+            nuevo_comentario = Comentarios(nombre=request.user, articulo=subasta, contenido=comentario)
+            nuevo_comentario.save()
+        return redirect(articleBid, subasta_id=subasta_id)
+
+            
 
 
 def trackingList(request, subasta_id):
@@ -227,6 +237,9 @@ def trackingList(request, subasta_id):
 
 
 def deleteView (request, subasta_id):
+     
+
+     
      articulo = Subastas.objects.get(pk=subasta_id)
      if request.method == "POST":
         articulo.delete()
@@ -235,6 +248,19 @@ def deleteView (request, subasta_id):
      return redirect('articleBid', subasta_id=subasta_id)
 
 
+def whatchlist (request):
+    seguimientos = SeguimientoSubasta.objects.filter(user=request.user, esta_seguido=True)
+    subastas = []
+    
+    for seguimiento in seguimientos:
+        subasta = Subastas.objects.get(pk=seguimiento.subasta_id)
+        subastas.append(subasta)
+        
+
+    return render(request, "auctions/whatchlist.html", 
+    
+    {"subastas": subastas}
+    )
 
 
    

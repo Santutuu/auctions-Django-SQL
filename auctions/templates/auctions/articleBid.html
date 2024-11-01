@@ -3,6 +3,7 @@
 
 {% block head %}
     <link href="{% static 'auctions/articleBid.css' %}" rel="stylesheet">
+    <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -25,12 +26,9 @@
 
                 <div id="descripcion">
                     {{articulo.descripcion}}
-                    
                 </div>
 
-                <div id="comentarios">
-                    {{form.comentarios}}
-                </div>
+                
 
                 <div id="mensaje">
                     {% if errorMessage %}
@@ -88,5 +86,22 @@
     </div>
  
     </section>
+
+    <aside>
+        <div class="comentarios">
+            <h3>Opiniones del producto</h3>
+            {% for comentario in comentariosList %}
+                <div id="comentario"> {{comentario.contenido}}</div>
+            {% endfor %}
+            
+            <form method="post" action="{% url 'comments' articulo.id %}">
+                {% csrf_token %}
+                
+                {{form.comentarios}}
+                <button type="submit" name="publicar"><strong>publicar</strong></button>
+            </form>
+            
+        </div>
+    </aside>
 
 {% endblock %}

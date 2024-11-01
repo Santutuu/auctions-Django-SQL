@@ -1,0 +1,57 @@
+
+{% extends "auctions/layout.html" %}
+{% load static %}
+
+{% block head %}
+    <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+    <link href="{% static 'auctions/index.css' %}" rel="stylesheet">
+    <link href="{% static 'auctions/whatchlist.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    
+
+{% if subastas %}
+    <h2 id="textoSeguimiento">Lista de seguimiento:</h2>
+    <section class="subastas">     
+        {% for subasta in subastas %}
+        
+            <article class="articulo">
+            
+                <div id="titulo">
+                    <h2>{{subasta.titulo}}</h2>
+                </div>
+                
+                <a class="link" href="{% url 'articleBid' subasta.id %}">
+
+                    <div class="contenido">
+
+                        <div class="imagen">
+                            <img src="{{ subasta.imagen }}">
+                        </div>
+                        
+                        <div class="descripcion">
+                            <p>{{subasta.descripcion}}</p>
+                        </div>
+
+                        
+                        <div class="oferta"> 
+                            <h5>Oferta inicial: {{subasta.ofertaInicial}}</h5>
+                        </div>
+                    
+                    </div>
+                </a>
+            </article>
+        
+        {% endfor %}
+        </section>
+        {% else %}
+            <h2>No aniadio ningun articulo a su lista de seguimiento</h2>
+        {% endif %}
+    
+    
+
+    {% endblock %}
+
+
+
