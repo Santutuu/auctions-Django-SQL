@@ -8,100 +8,85 @@
 
 {% block body %}
 
+<section class="articulo">
+    <div class="imagen">
+        <img src="{{articulo.imagen}}" style="{% if not articulo.activa %}filter: brightness(0.35);{% endif %}">
+        {% if not articulo.activa %}
+            <h2 id="ganador">Ganador <strong>{{ofertante}}</strong></h2>
+        {% endif %}
+    </div>
+    
+    <div class="contenido2">       
+        <div class="contenido1" style="{% if not articulo.activa %}background-color: grey;{% endif %}">
 
+            <div id="titulo">
+                <h1>{{articulo.titulo}}</h1>
+            </div>
 
-    <section class="articulo">
-        <div class="imagen">
-            <img src="{{articulo.imagen}}">
-        </div>
-        
-        <div class="contenido2">
-            <div class="contenido1">
+            <div id="mensaje">
+                {% if errorMessage %}
+                    {{ errorMessage }}
+                {% endif %}
+            </div>
 
-                <div id="titulo">
-                    <h1>{{articulo.titulo}}</h1>
-                </div>
-
-                
-
+            {% if articulo.activa %}
                 <div id="descripcion">
                     {{articulo.descripcion}}
                 </div>
 
-                
+                <div id="precio">
+                    <h2>{{oferta}}$</h2>
+                    <div id="ofertante">
+                        Ofertante actual: <b>{{ofertante}}</b>
+                    </div>
 
-                <div id="mensaje">
-                    {% if errorMessage %}
-                        {{ errorMessage }}
+                    {% if articulo.creador != request.user %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="number" id="ofertar" name="ofertar" value="{{ oferta|add:10 }}">
+                            <button type="submit"><strong>Ofertar</strong></button>
+                        </form>
                     {% endif %}
                 </div>
+            {% endif %}
+        </div>
 
-
-                <div id="precio">
-                    
-                
-                    
-                        <h2>{{oferta}}$</h2>
-                        <div id="ofertante">
-                            Ofertante actual: <b>{{ofertante}}</b>
-                        </div>
-                        
-                    <form method="post">
+        {% if articulo.activa %}
+            <div class="botones">
+                {% if not boton %}
+                    <form method="post" action="{% url 'trackingList' articulo.id %}">
                         {% csrf_token %}
-                        
-                        <input type="number" id="ofertar" name="ofertar" value="{{ oferta|add:10 }}">
-                    
-                        
-                        <button type="submit"><strong>Ofertar</strong></button>
-
-                       
+                        <button type="submit" name="listaSeguimiento" id="listaSeguimiento"><strong>{{message}}</strong></button>
                     </form>
-         </div>
+                {% endif %}
 
-            
-
-        </div>
-
-        <div class="botones">
-            {% if not boton %}
-                <form method="post" action="{% url 'trackingList' articulo.id %}">
-                {% csrf_token %}
-                
-                <button type="submit" name="listaSeguimiento" id="listaSeguimiento"><strong>{{message}}</strong></button>
-                </form>
-            {% endif %}
-
-            {% if boton %}
-                <form method="post" action="{% url 'deleteView' articulo.id %}">
-                    {% csrf_token %}
-                    <button type="submit" name="eliminar" id="eliminar"><strong>Eliminar</strong> articulo</button>
-                </form>
-            {% endif %}
-            
-            
-
-        </div>
-        
-
+                {% if boton %}
+                    <form method="post" action="{% url 'deleteView' articulo.id %}">
+                        {% csrf_token %}
+                        <button type="submit" name="eliminar" id="eliminar"><strong>Cerrar Subasta</strong></button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
- 
-    </section>
+</section>
 
-    <aside>
-        <div class="comentarios">
-            <h3>Opiniones del producto</h3>
-            {% for comentario in comentariosList %}
-                <div id="comentario"> {{comentario.contenido}}</div>
-            {% endfor %}
+
+<aside>
+    <div class="comentarios">
+        <h3>Opiniones del producto</h3>
+        {% for comentario in comentariosList %}
+            <div id="comentario"> {{comentario.contenido}}</div>
+        {% endfor %}
+        
+        <form method="post" action="{% url 'comments' articulo.id %}">
+            {% csrf_token %}
             
-            <form method="post" action="{% url 'comments' articulo.id %}">
-                {% csrf_token %}
-                
-                {{form.comentarios}}
-                <button type="submit" name="publicar"><strong>publicar</strong></button>
-            </form>
-            
-        </div>
-    </aside>
+            {{form.comentarios}}
+            <button type="submit" name="publicar"><strong>publicar</strong></button>
+        </form>
+        
+    </div>
+</aside>
 
 {% endblock %}

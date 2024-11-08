@@ -16,7 +16,7 @@ from .models import User
 
 def index(request):
 
-    subastas = Subastas.objects.all()
+    subastas = Subastas.objects.filter(activa=True)
 
     return render(request, "auctions/index.html", 
                   {
@@ -80,16 +80,10 @@ def createListing(request):
     
     if request.method == "POST":  #comprueba que se trata de un form 
 
-        form = Crear(request.POST)  # chequea toda la data que se subio en el form y la guarda en la variable form 
+        form = Crear(request.POST, request.FILES)  # chequea toda la data que se subio en el form y la guarda en la variable form 
 
         if form.is_valid():
-            titulo = form.cleaned_data["titulo"]    
-            descripcion = form.cleaned_data["descripcion"] 
-            imagen = form.cleaned_data["imagen"] 
-            oferta = form.cleaned_data["ofertaInicial"] 
-            
-            nuevo_subasta = Subastas(titulo=titulo, descripcion=descripcion, imagen=imagen, ofertaInicial=oferta, creador=request.user)
-            nuevo_subasta.save()
+            form.save() #Guarda automaticamente los datos que se envien al formulario, en el campo del model correspondiente especificado en el form
 
             return redirect('index')
         
@@ -126,12 +120,11 @@ def articleBid(request, subasta_id):
     nuevo_oferta = None
     nuevo_comentario = None
     boton = False
-    message = None  # Inicializar message
 
-    # Manejar mensajes flash
-    if messages.get_messages(request):
-        for msg in messages.get_messages(request):
-            message = msg  # Sobrescribir el mensaje por defecto si hay uno flash
+    #Recupera el mensaje especifico para la subasta
+    message_key = f'tracking_message_{subasta_id}'
+    
+    message = request.session.get(message_key, "Añadir a lista de seguimiento")
 
     form = ComentariosForm(request.POST)
 
@@ -149,7 +142,7 @@ def articleBid(request, subasta_id):
         ofertanteActual = "No hay ofertas"
 
      # Obtener todos los comentarios relacionados con la subasta
-    comentariosList = Comentarios.objects.filter(articulo=articulo)[:3]
+    comentariosList = Comentarios.objects.filter(articulo=articulo).order_by('-id')[:3]
 
     if request.method == "POST":
         
@@ -168,7 +161,8 @@ def articleBid(request, subasta_id):
                 "errorMessage": "La oferta debe ser al menos $10 mayor a la anterior.",
                 "boton": boton,
                 "form": form,
-                "comentariosList": comentariosList
+                "comentariosList": comentariosList,
+                "message": message,
             })
 
 
@@ -176,25 +170,14 @@ def articleBid(request, subasta_id):
         "articulo": articulo,
         "oferta": ofertaActual,
         "ofertante": ofertanteActual,
-        "message": message if message else "Añadir a lista de seguimiento",
+        "message": message,
         "boton": boton, 
         "form": form,
         "comentariosList": comentariosList
     })
 
 
-def comments(request, subasta_id):
-    
-    subasta = Subastas.objects.get(pk=subasta_id)
-    
-    if request.method == "POST":
 
-        form = ComentariosForm(request.POST)
-        if form.is_valid():
-            comentario = form.cleaned_data["comentarios"]
-            nuevo_comentario = Comentarios(nombre=request.user, articulo=subasta, contenido=comentario)
-            nuevo_comentario.save()
-        return redirect(articleBid, subasta_id=subasta_id)
 
             
 
@@ -211,25 +194,28 @@ def trackingList(request, subasta_id):
 
             
             if (seguimiento.esta_seguido == True):
-                message = "Remover de lista de seguimiento"
+                message = "Añadir a lista de seguimiento"
                 seguimiento.esta_seguido = False
-                messages.info(request, message)
+                
 
             else:
 
-                message = "Añadir a lista de seguimiento" 
+                message = "Remover de lista de seguimiento" 
                 seguimiento.esta_seguido = True
             
             seguimiento.save()    
-            messages.info(request, message) #Enviar el mensaje flash
+        
                 
         except SeguimientoSubasta.DoesNotExist:
 
             seguimiento = SeguimientoSubasta(user=usuario, subasta=subasta, esta_seguido=True) #Sino esta, lo crea
             seguimiento.save()
-            messages.info(request, "Remover de la lista de segumiento")
             
-
+            
+        
+        # Guardar el estado del mensaje en la sesión para la subasta específica
+        # Crea un diccionario donde guarda el valor del mensaje
+        request.session[f'tracking_message_{subasta_id}'] = message 
 
     return redirect('articleBid', subasta_id=subasta_id)
 
@@ -237,16 +223,30 @@ def trackingList(request, subasta_id):
 
 
 def deleteView (request, subasta_id):
-     
+    articulo = Subastas.objects.get(pk=subasta_id)
+    ofertaActual = Oferta.objects.filter(articulo=articulo).order_by('-ofertaActual').first() 
+    ofertanteActual = ofertaActual.ofertanteActual
 
-     
-     articulo = Subastas.objects.get(pk=subasta_id)
-     if request.method == "POST":
-        articulo.delete()
-        return redirect('index')
-     
-     return redirect('articleBid', subasta_id=subasta_id)
+    if request.method == "POST":
+        
+        articulo.activa=False
+        articulo.save()
+        
+    return redirect('articleBid', subasta_id=subasta_id)
 
+
+def comments(request, subasta_id):
+    
+    subasta = Subastas.objects.get(pk=subasta_id)
+    
+    if request.method == "POST":
+
+        form = ComentariosForm(request.POST)
+        if form.is_valid():
+            comentario = form.cleaned_data["comentarios"]
+            nuevo_comentario = Comentarios(nombre=request.user, articulo=subasta, contenido=comentario)
+            nuevo_comentario.save()
+        return redirect(articleBid, subasta_id=subasta_id)
 
 def whatchlist (request):
     seguimientos = SeguimientoSubasta.objects.filter(user=request.user, esta_seguido=True)

@@ -17,6 +17,7 @@ class Subastas(models.Model):
     imagen = models.CharField(max_length=70, null=True)
     ofertaInicial =  models.IntegerField()
     creador = models.ForeignKey (User, on_delete=models.CASCADE, related_name="usuario", default=1)
+    activa =  models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.titulo} || oferta inicial: {self.ofertaInicial}::{self.descripcion}"

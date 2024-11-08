@@ -1,4 +1,5 @@
 from django import forms
+from .models import Subastas
 
 
 
@@ -21,12 +22,12 @@ class Crear(forms.Form):
         })
     )
     
-    imagen = forms.URLField(
-        label='URL de la Imagen',
-        widget=forms.TextInput(attrs={
+    imagen = forms.ImageField(
+        label='Seleccionar imagen',
+        widget=forms.ClearableFileInput(attrs={
             'class': 'publicacion',
             'id': 'imagen',
-            'placeholder': 'https://example.com/imagen.jpg',
+            'placeholder': 'Arrastra tu archivo aqui',
             'name': 'imagen'
         })
     )
@@ -39,6 +40,10 @@ class Crear(forms.Form):
             'name': 'ofertaInicial'
         })
     )
+
+    class Meta:
+        model = Subastas
+        fields = ['titulo', 'descripcion', 'imagen', 'ofertaInicial']
 
 
 class ofertar (forms.Form):

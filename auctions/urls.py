@@ -1,8 +1,9 @@
 from django.urls import path
-
+from django.contrib import admin
 from . import views
 
 urlpatterns = [
+    path ('/admin', admin.site.urls),
     path("", views.index, name="index"),
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
@@ -12,5 +13,5 @@ urlpatterns = [
     path("<int:subasta_id>/seguir/", views.trackingList, name="trackingList"),
     path("<int:subasta_id>/eliminar/", views.deleteView, name="deleteView"),
     path("<int:subasta_id>/comentarios/", views.comments, name="comments"),
-    path("whatchlist", views.whatchlist, name="whatchlist")
+    path("whatchlist", views.whatchlist, name="whatchlist"),
 ]

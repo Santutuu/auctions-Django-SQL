@@ -116,11 +116,21 @@
     margin-bottom: 50px;
 }
 
+#ganador {
+    margin: auto;
+    transform: translate(300px, -350px);
+    color: white;  
+}
+
+#ganador > strong {
+    color: gold;
+}
 #comentario {
     margin-bottom: 40px;
     padding: 5px;
     padding-bottom: 30px;
     
+
 
 }
 
