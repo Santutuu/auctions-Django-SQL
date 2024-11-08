@@ -14,7 +14,7 @@ class Subastas(models.Model):
     
     titulo = models.CharField (max_length=50)
     descripcion = models.CharField (max_length=300)
-    imagen = models.CharField(max_length=70, null=True)
+    imagen = models.ImageField(null=True)
     ofertaInicial =  models.IntegerField()
     creador = models.ForeignKey (User, on_delete=models.CASCADE, related_name="usuario", default=1)
     activa =  models.BooleanField(default=True)
