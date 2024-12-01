@@ -6,3 +6,5 @@ from .models import User, Subastas, Oferta
 admin.site.register(User)
 admin.site.register(Subastas)
 admin.site.register(Oferta)
+
+

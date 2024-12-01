@@ -2,7 +2,7 @@ from django.urls import path
 from django.contrib import admin
 from . import views
 from django.conf import settings
-from django.conf.urls.static import static
+
 
 urlpatterns = [
     path ('admin/', admin.site.urls),
@@ -17,4 +17,4 @@ urlpatterns = [
     path("<int:subasta_id>/comentarios/", views.comments, name="comments"),
     path("whatchlist", views.whatchlist, name="whatchlist"),
   
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] 

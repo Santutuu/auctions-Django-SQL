@@ -3,7 +3,7 @@ from .models import Subastas
 
 
 
-class Crear(forms.Form):
+class Crear(forms.ModelForm):
      
     titulo = forms.CharField(
         label='Título',

@@ -88,6 +88,7 @@ def createListing(request):
             return redirect('index')
         
         else:
+            print(form.errors)
             return render(request, "auctions/createListing.html",  #si hay un error, se renferiza el archivo de nuevo con los errores 
                           {"form": form 
                            })
