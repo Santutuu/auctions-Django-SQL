@@ -7,6 +7,7 @@ from django.conf import settings
 urlpatterns = [
     path ('admin/', admin.site.urls),
     path("", views.index, name="index"),
+    path('categoria/<str:categoria>/', views.index, name='indexFiltrado'),
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
     path("register", views.register, name="register"),
@@ -16,5 +17,6 @@ urlpatterns = [
     path("<int:subasta_id>/eliminar/", views.deleteView, name="deleteView"),
     path("<int:subasta_id>/comentarios/", views.comments, name="comments"),
     path("whatchlist", views.whatchlist, name="whatchlist"),
-  
+    path("filterByCategory", views.filterByCategory, name="filter"),
+
 ] 

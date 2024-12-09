@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -6,7 +7,8 @@ from django.urls import reverse
 from django import forms
 from django.contrib import messages
 
-from . forms import Crear, ComentariosForm
+
+from . forms import Crear, ComentariosForm, Categoria
 
 from . models import Subastas, Oferta, SeguimientoSubasta, User, Comentarios
 
@@ -14,13 +16,19 @@ from . models import Subastas, Oferta, SeguimientoSubasta, User, Comentarios
 from .models import User
 
 
-def index(request):
+def index(request, categoria=None):
 
-    subastas = Subastas.objects.filter(activa=True)
+    if categoria and categoria != 'todos':
+        subastas = Subastas.objects.filter(activa=True, categoria=categoria)
+    else:
+        subastas = Subastas.objects.filter(activa=True)
+
+    form = Categoria(initial={'categoria': categoria or 'todos'})  # Si no hay categoría, usar 'todos'
 
     return render(request, "auctions/index.html", 
                   {
-        "subastas": subastas
+        "subastas": subastas,
+        "form": form
       })
 
 
@@ -71,11 +79,14 @@ def register(request):
                 "message": "Username already taken."
             })
         login(request, user)
-        return HttpResponseRedirect(reverse("index"))
+        next_url = request.GET.get('next', 'index')  # Redirige a la página inicial si no hay `next`
+        return redirect(next_url)
     else:
         return render(request, "auctions/register.html")
 
 
+
+@login_required
 def createListing(request):
     
     if request.method == "POST":  #comprueba que se trata de un form 
@@ -106,7 +117,10 @@ def bidLogic(_articulo, _ofertante, _oferta, _ofertaActual):
 
     if _oferta >= (_ofertaActual + 10):
             nuevo_oferta = Oferta(articulo=_articulo, ofertaActual=_oferta, ofertanteActual=_ofertante)
+            _articulo.ofertaActual=_oferta
+            
             nuevo_oferta.save()
+            _articulo.save()
 
             # Guarda la nueva oferta y ofertante
             ofertaActual = nuevo_oferta.ofertaActual 
@@ -116,7 +130,7 @@ def bidLogic(_articulo, _ofertante, _oferta, _ofertaActual):
     return None
 
 
-
+@login_required
 def articleBid(request, subasta_id):
     nuevo_oferta = None
     nuevo_comentario = None
@@ -179,14 +193,11 @@ def articleBid(request, subasta_id):
 
 
 
-
-            
-
-
 def trackingList(request, subasta_id):
     nuevo_seguimiento = None
     usuario= request.user #guarde el id del usuario
     subasta = Subastas.objects.get(pk=subasta_id)
+    message="Remover de lista de seguimiento" 
 
     if request.method == "POST":
 
@@ -211,8 +222,7 @@ def trackingList(request, subasta_id):
 
             seguimiento = SeguimientoSubasta(user=usuario, subasta=subasta, esta_seguido=True) #Sino esta, lo crea
             seguimiento.save()
-            
-            
+
         
         # Guardar el estado del mensaje en la sesión para la subasta específica
         # Crea un diccionario donde guarda el valor del mensaje
@@ -236,6 +246,7 @@ def deleteView (request, subasta_id):
     return redirect('articleBid', subasta_id=subasta_id)
 
 
+
 def comments(request, subasta_id):
     
     subasta = Subastas.objects.get(pk=subasta_id)
@@ -249,6 +260,7 @@ def comments(request, subasta_id):
             nuevo_comentario.save()
         return redirect(articleBid, subasta_id=subasta_id)
 
+@login_required
 def whatchlist (request):
     seguimientos = SeguimientoSubasta.objects.filter(user=request.user, esta_seguido=True)
     subastas = []
@@ -264,6 +276,15 @@ def whatchlist (request):
     )
 
 
+def filterByCategory(request):
+    if request.method=="POST":
+
+        eleccionCategoria = request.POST["categoria"]  # chequea la data seleccionada en categoria y la guarda en la variable 
+        
+        return redirect('indexFiltrado', categoria=eleccionCategoria)
+
+
+
    
 
  
@@ -272,8 +293,7 @@ def whatchlist (request):
 
 
 
-     
-
+    
          
 
 

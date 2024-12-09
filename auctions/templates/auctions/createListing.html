@@ -19,6 +19,11 @@
                 {{ form.titulo }}
             </div>
 
+            <div class="form-group" id="categoria">
+                <h3>{{ form.categoria.label_tag }}</h3>
+                {{ form.categoria }} 
+            </div>
+            
             <div class="form-group">
                 <label for="{{ form.descripcion.id_for_label }}"><h4>{{ form.descripcion.label }}</h4></label>
                 {{ form.descripcion }}

@@ -25,7 +25,7 @@
 }
 
 
-.form-group input, textarea {
+.form-group input, textarea, select {
     border: 2px solid black;
     border-radius: 10px;
 

@@ -3,10 +3,21 @@
 
 {% block head %}
     <link href="{% static 'auctions/index.css' %}" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
+    <section class="categorias">
+        <form method="post" action="{% url 'filter'%}">
+            {% csrf_token %}
 
+            {{ form.categoria.label_tag }} 
+            {{ form.categoria }} 
+            
+            <button type="submit" id="confirmarCategoria"><strong>Filtrar</strong></button>
+        </form>
+
+    </section>
     <section class="subastas">
         
             {% for subasta in subastas %}
@@ -30,7 +41,7 @@
 
                             
                             <div class="oferta"> 
-                                <h5>Oferta inicial: {{subasta.ofertaInicial}}</h5>
+                                <h5>Oferta actual: {{subasta.ofertaActual}}</h5>
                             </div>
                         
                         </div>

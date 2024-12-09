@@ -11,6 +11,13 @@ class User(AbstractUser):
 
     
 class Subastas(models.Model):
+
+    CATEGORIAS = [
+        ('futbolistas', 'Futbolistas'),
+        ('articulosLimpieza', 'Artículos de Limpieza'),
+        
+        
+    ]
     
     titulo = models.CharField (max_length=50)
     descripcion = models.CharField (max_length=300)
@@ -18,6 +25,8 @@ class Subastas(models.Model):
     ofertaInicial =  models.IntegerField()
     creador = models.ForeignKey (User, on_delete=models.CASCADE, related_name="usuario", default=1)
     activa =  models.BooleanField(default=True)
+    ofertaActual= models.IntegerField(default=0)
+    categoria = models.CharField(max_length=50, choices=CATEGORIAS, default='futbolistas')
 
     def __str__(self):
         return f"{self.titulo} || oferta inicial: {self.ofertaInicial}::{self.descripcion}"

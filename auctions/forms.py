@@ -41,9 +41,16 @@ class Crear(forms.ModelForm):
         })
     )
 
+    categoria = forms.ChoiceField(
+        choices=[
+            ('futbolistas', 'Futbolistas'),
+            ('articulosLimpieza', 'Artículos de Limpieza'),
+        ],
+        widget=forms.Select
+    )
     class Meta:
         model = Subastas
-        fields = ['titulo', 'descripcion', 'imagen', 'ofertaInicial']
+        fields = ['titulo', 'descripcion', 'imagen', 'ofertaInicial', 'categoria']
 
 
 class ofertar (forms.Form):
@@ -73,9 +80,17 @@ class ComentariosForm(forms.Form):
     )
 
 
+class Categoria(forms.Form):
+    categoria = forms.ChoiceField(
+        choices=[
+            ('todos', 'Todos los Articulos'),
+            ('futbolistas', 'Futbolistas'),
+            ('articulosLimpieza', 'Artículos de Limpieza'),
+        ],
+        widget=forms.Select
+    )
+
+
+        
     
-
-
-
-
-     
+    

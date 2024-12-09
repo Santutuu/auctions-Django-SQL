@@ -10,7 +10,7 @@
 
 <section class="articulo">
     <div class="imagen">
-        <img src="{{articulo.imagen}}" style="{% if not articulo.activa %}filter: brightness(0.35);{% endif %}">
+        <img src="{{articulo.imagen.url}}" style="{% if not articulo.activa %}filter: brightness(0.35);{% endif %}">
         {% if not articulo.activa %}
             <h2 id="ganador">Ganador <strong>{{ofertante}}</strong></h2>
         {% endif %}
