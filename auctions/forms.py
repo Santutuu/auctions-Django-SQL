@@ -3,51 +3,52 @@ from .models import Subastas
 
 
 
+from django import forms
+from .models import Subastas
+
 class Crear(forms.ModelForm):
-     
     titulo = forms.CharField(
         label='Título',
         widget=forms.TextInput(attrs={
-            'class': 'publicacion',
-            'id': 'titulo'
+            'class': 'form-control',
+            'id': 'titulo',
+            'placeholder': 'Ingresa el título de tu subasta'
         })
     )
-    
     descripcion = forms.CharField(
         label='Descripción',
         widget=forms.Textarea(attrs={
+            'class': 'form-control',
             'rows': 6,
-            'cols': 50,
-            'name': 'descripcion'
+            'placeholder': 'Describe el artículo que estás subastando'
         })
     )
-    
     imagen = forms.ImageField(
         label='Seleccionar imagen',
         widget=forms.ClearableFileInput(attrs={
-            'class': 'publicacion',
+            'class': 'form-control',
             'id': 'imagen',
-            'placeholder': 'Arrastra tu archivo aqui',
-            'name': 'imagen'
+            'placeholder': 'Arrastra tu archivo aquí'
         })
     )
-    
     ofertaInicial = forms.DecimalField(
         label='Oferta Inicial',
-        
         widget=forms.NumberInput(attrs={
-            'class': 'publicacion',
-            'name': 'ofertaInicial'
+            'class': 'form-control',
+            'placeholder': 'Ingresa la oferta inicial'
         })
     )
-
     categoria = forms.ChoiceField(
+        label='Categoría',
         choices=[
             ('futbolistas', 'Futbolistas'),
             ('articulosLimpieza', 'Artículos de Limpieza'),
         ],
-        widget=forms.Select
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        })
     )
+
     class Meta:
         model = Subastas
         fields = ['titulo', 'descripcion', 'imagen', 'ofertaInicial', 'categoria']

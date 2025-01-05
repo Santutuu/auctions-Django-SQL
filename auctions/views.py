@@ -24,7 +24,7 @@ def index(request, categoria=None):
         subastas = Subastas.objects.filter(activa=True)
 
     form = Categoria(initial={'categoria': categoria or 'todos'})  # Si no hay categoría, usar 'todos'
-
+    print (subastas)
     return render(request, "auctions/index.html", 
                   {
         "subastas": subastas,
@@ -269,9 +269,11 @@ def whatchlist (request):
         subasta = Subastas.objects.get(pk=seguimiento.subasta_id)
         subastas.append(subasta)
         
-
+    print (subastas)
     return render(request, "auctions/whatchlist.html", 
     
+    
+
     {"subastas": subastas}
     )
 

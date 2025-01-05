@@ -1,0 +1,46 @@
+.autenticate {
+  
+    margin: auto;
+    margin-top: 100px;
+    width: 450px;
+    height: 500px;
+    padding-top: 50px;
+    padding: 50px 20px 20px 20px;
+    background-color:rgb(119, 119, 236);
+    position: relative;
+}
+
+.form-control {
+    width: 400px;
+    margin: auto;
+}
+
+.btn {
+    width: 400px;
+    background-color:#34495E;
+}
+
+
+
+
+.letrita {
+    margin-bottom: 50px;
+    color: white;
+    text-align: center;
+    
+}
+
+.letrita2 {
+    color: aqua;
+    position: absolute;
+    bottom: 15px;
+    
+}
+
+
+b{
+    color: white;
+}
+
+
+    
