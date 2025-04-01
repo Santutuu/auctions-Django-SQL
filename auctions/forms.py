@@ -15,6 +15,11 @@ class Crear(forms.ModelForm):
             'placeholder': 'Ingresa el título de tu subasta'
         })
     )
+
+    def clean_titulo(self):
+        titulo = self.cleaned_data.get("titulo")
+        return titulo.capitalize() if titulo else titulo
+
     descripcion = forms.CharField(
         label='Descripción',
         widget=forms.Textarea(attrs={
@@ -43,6 +48,7 @@ class Crear(forms.ModelForm):
         choices=[
             ('futbolistas', 'Futbolistas'),
             ('articulosLimpieza', 'Artículos de Limpieza'),
+            ('Accesorios', 'Accesorios y joyas'),
         ],
         widget=forms.Select(attrs={
             'class': 'form-select'
@@ -54,10 +60,28 @@ class Crear(forms.ModelForm):
         fields = ['titulo', 'descripcion', 'imagen', 'ofertaInicial', 'categoria']
 
 
-class ofertar (forms.Form):
-    oferta = forms.DecimalField(min_value=0)
+class OfertaForm(forms.Form):
+    oferta = forms.IntegerField(min_value=0, label='', required=False,
+        widget=forms.NumberInput(attrs={
+            'id': 'ofertar',
+        })
+    )
 
-    """def clean_oferta(self):
+    def __init__(self, *args, **kwargs):
+        # Recibe el valor de oferta_actual desde la vista
+        ofertaActual = kwargs.pop('ofertaActual', 0)  
+        super().__init__(*args, **kwargs)
+        # Establece la oferta actual + 10 como valor inicial
+        self.fields['oferta'].initial = ofertaActual + 10  
+
+    def clean_oferta(self):
+        oferta = self.cleaned_data.get('oferta')
+        
+        return oferta  # Asegúrate de devolver el valor correctamente
+      
+
+
+    """
 
         oferta = self.cleaned_data.get('oferta')
         if "@" in nombre:

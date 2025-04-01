@@ -1,13 +1,18 @@
 
 
 
-html {
-    font-size: 20px;
-}
-
 body {
     background-color: #D6DBDF; 
+    font-size: 20px;
+  
 }
+
+
+
+h1 {
+    font-size: 40px;
+}
+
 nav {
     background-color: #34495E ;
     height: 130px;

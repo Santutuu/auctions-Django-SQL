@@ -1,13 +1,17 @@
 
 
 .entradas {
-    margin-left: 100px;
-    margin-top: 150px;
+
+    margin-top: 100px;
+
+    display: grid;
+    place-items: center;
     
 }
 
 .entrada {
     margin-bottom: 30px;
+    font-size: 22px;
 
 }
 
@@ -15,7 +19,9 @@
 .form-control, .form-select {
     width: 500px;
     background-color: #f8f9fa;
-    margin: ;
+    border: 3px solid #34495E;
+    font-size: 20px;
+
     
 }
 
@@ -23,12 +29,11 @@
 
     width: 500px;
 }
-#titulo  {
-   
-}
 
-
-
-.botonsito {
-    background-color: yellow;
+.btn-outline-success {
+    border: 3px solid green;
+    margin-bottom: 100px;
+    margin-top: 30px;
+    width: 500px;
+    font-size: 20px;
  }

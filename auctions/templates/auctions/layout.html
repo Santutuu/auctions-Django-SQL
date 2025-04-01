@@ -6,6 +6,7 @@
         <title>{% block title %}Auctions{% endblock %}</title>
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
         <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
         {% block head %}{% endblock %}
     </head>
     <body>
@@ -35,6 +36,7 @@
                                   <div class="dropdown-menu" aria-labelledby="basicDropdown">
                                       <a class="dropdown-item" href="{% url 'indexFiltrado' 'futbolistas' %}">Futbolistas</a>
                                       <a class="dropdown-item" href="{% url 'indexFiltrado' 'articulosLimpieza' %}">Artículos de limpieza</a>
+                                      <a class="dropdown-item" href="{% url 'indexFiltrado' 'Accesorios' %}">Accesorios y joyas</a>
                                       <a class="dropdown-item" href="{% url 'indexFiltrado' 'todos' %}">Ver todos</a>
                                   </div>
                               </li>
@@ -43,9 +45,10 @@
                                 <a class="nav-link" href="{% url 'create' %}">Create listing</a>
                               </li>
                               
-                              <li class="nav-item ms-3">
-                                  <a class="nav-link" href="{% url 'whatchlist' %}">Whatchlist</a>
-                              </li>
+                              <a class="nav-link" href="{% url 'whatchlist' %}">
+                                Watchlist{% if seguidos %} <span>({{ seguidos }})</span>{% endif %}
+                            </a>
+                            
 
                               <li class="nav-item ms-3">
                                   <a class="nav-link" href="{% url 'logout' %}">Log out</a>

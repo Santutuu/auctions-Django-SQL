@@ -34,7 +34,7 @@
     border: 1px solid black;
     border-radius: 10px;
     width: 400px;
-    height: 500px;
+    height: 420px;
     
 
 
@@ -47,12 +47,16 @@
 }
 
 #titulo {
-    margin-left: 100px;
+    display: grid;
+    align-content: center;
 }
+
 
 #descripcion {
 
     font-size: large;
+    margin: auto;
+    
 }
 
 
@@ -71,6 +75,9 @@
     border-radius: 10px;
     padding-left: 20px;
     width: 200px;
+    height: 40px;
+    
+
 
 }
 
@@ -82,7 +89,7 @@
 
 #ofertante b {
 
-    color: rgb(218, 188, 19);
+    color: rgb(161, 87, 17);
 }
 
 
@@ -127,11 +134,62 @@
     color: gold;
 }
 #comentario {
-    margin-bottom: 40px;
-    padding: 5px;
-    padding-bottom: 30px;
+   transform: translate(0, 10px);
+   font-size: large;
     
-
-
 }
 
+.comentario{
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+
+}
+.usuario {
+    font-size: medium;
+    
+}
+
+#simboloUsuario {
+    color:black;
+    height: 45px;
+}
+
+#cronometro {
+    background-color: #34495E; /* Gris oscuro */
+    color: #ffff; /* Verde fluorescente */
+    font-family: 'Digital 7'; /* Aplica la fuente Digital 7 */
+    font-size: 48px;  /* Ajusta el tamaño del cronómetro */
+    font-weight: 700; /* Ajusta el peso si es necesario */
+         /* Ajusta el color del cronómetro */
+    border: 4px solid rgb(66, 65, 65);
+    padding: auto;
+    margin: 10px 15px 15px 0px;
+    border-radius: 10px;
+    width: 97%;
+    height: 70px;
+    text-align: center;
+    
+    
+}
+
+
+
+#resetear {
+    margin-left: 300px; 
+    margin-top: 20px;   
+    border: 2px solid black;
+    background-color: purple;
+    color: aqua;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.ofertar {
+    display: flex;
+    gap: 10px;
+    height: 40px;
+}
+#confirmarOferta {
+    height: 40px;
+}

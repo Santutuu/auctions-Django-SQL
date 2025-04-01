@@ -24,9 +24,8 @@
                         <a class="link" href="{% url 'articleBid' subasta.id %}">
                             <div class="card-header p-1">{{ subasta.categoria }}</div>
                             <div class="card-body p-0">
-                                <img src="{{ subasta.imagen.url }}" class="card-img-top">
+                                <img src="{{ subasta.imagen.url }}" class="imagenSubasta">
                                 <h5 class="card-title">{{ subasta.titulo }}</h5>
-                                <p class="card-text">{{ subasta.descripcion }}</p>
                                 <h6 class="card-text" id="ofertaActual">Oferta actual: ${{ subasta.ofertaActual }}</h6>
                             </div>
                         </a>
@@ -35,7 +34,6 @@
             {% endfor %}
         </div>
     </div>
-    
      
     
     

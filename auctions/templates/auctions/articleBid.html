@@ -4,11 +4,38 @@
 {% block head %}
     <link href="{% static 'auctions/articleBid.css' %}" rel="stylesheet">
     <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
+    <meta name="csrf-token" content="{% csrf_token %}">
+    
 {% endblock %}
 
 {% block body %}
 
+
+
+<script id="inicio">
+    const articuloId = "{{articulo.id}}";
+    const INICIO = "{{ inicio|date:'Y-m-d\\TH:i:s' }}";
+    const FINAL = "{{ finalizacion|date:'Y-m-d\\TH:i:s' }}";
+</script>
+
+
+
+<input type="reset" class="resetear" id="resetear">
+
+<form method="POST">
+    {% csrf_token %}
+</form>
+
+<script src="{% static 'auctions/reloj.js' %}"></script>
+
+
+
+
+
+
 <section class="articulo">
+
     <div class="imagen">
         <img src="{{articulo.imagen.url}}" style="{% if not articulo.activa %}filter: brightness(0.35);{% endif %}">
         {% if not articulo.activa %}
@@ -16,12 +43,19 @@
         {% endif %}
     </div>
     
-    <div class="contenido2">       
+    
+    <div class="contenido2"> 
+        <div class"cronometro" id="cronometro">
+
+        </div>      
         <div class="contenido1" style="{% if not articulo.activa %}background-color: grey;{% endif %}">
 
-            <div id="titulo">
-                <h1>{{articulo.titulo}}</h1>
+            
+            <div class="text-center" id="titulo">
+                <h2>{{articulo.titulo}}</h2>
             </div>
+
+           
 
             <div id="mensaje">
                 {% if errorMessage %}
@@ -43,8 +77,10 @@
                     {% if articulo.creador != request.user %}
                         <form method="post">
                             {% csrf_token %}
-                            <input type="number" id="ofertar" name="ofertar" value="{{ oferta|add:10 }}">
-                            <button type="submit"><strong>Ofertar</strong></button>
+                            <div class="ofertar">
+                            {{ ofertaForm.as_p }}
+                            <button type="submit" id="confirmarOferta"><strong>Ofertar</strong></button>
+                            </div>
                         </form>
                     {% endif %}
                 </div>
@@ -61,10 +97,19 @@
                 {% endif %}
 
                 {% if boton %}
-                    <form method="post" action="{% url 'deleteView' articulo.id %}">
-                        {% csrf_token %}
-                        <button type="submit" name="eliminar" id="eliminar"><strong>Cerrar Subasta</strong></button>
-                    </form>
+                <form method="post" action="{% url 'deleteView' articulo.id %}" id="deleteForm">
+                    {% csrf_token %}
+                    <button type="submit" name="eliminar" id="eliminar"><strong>Cerrar Subasta</strong></button>
+                </form>
+                
+                <script>
+                    document.getElementById('deleteForm').addEventListener('submit', (event) => {
+                        const confirmacion = confirm('¿Desea cerrar esta subasta?');
+                        if (!confirmacion) {
+                            event.preventDefault(); // Cancela el envío del formulario
+                        }
+                    });
+                </script>
                 {% endif %}
             </div>
         {% endif %}
@@ -76,7 +121,15 @@
     <div class="comentarios">
         <h3>Opiniones del producto</h3>
         {% for comentario in comentariosList %}
-            <div id="comentario"> {{comentario.contenido}}</div>
+            <article class="comentario">
+                <div class="usuario">
+                <img src="{% static 'auctions/usuario.svg' %}" id="simboloUsuario">
+                <p>{{comentario.nombre}}</p>
+                </div>
+
+                <div id="comentario"> {{comentario.contenido}}</div>
+                
+            </article>
         {% endfor %}
         
         <form method="post" action="{% url 'comments' articulo.id %}">
@@ -88,5 +141,7 @@
         
     </div>
 </aside>
+
+
 
 {% endblock %}

@@ -56,9 +56,15 @@
                             <div class="card-header p-1">{{ subasta.categoria }}</div>
                             <div class="card-body p-0">
                                 <img src="{{ subasta.imagen.url }}" class="imagenSubasta">
-                                <h5 class="card-title">{{ subasta.titulo }}</h5>
-                                <p class="card-text">{{ subasta.descripcion }}</p>
-                                <h6 class="card-text" id="ofertaActual">Oferta actual: ${{ subasta.ofertaActual }}</h6>
+                                <h5 class="card-title m-3 mb-2">{{ subasta.titulo }}</h5>
+                                <h6 class="card-text ml-3" id="ofertaActual">
+                                    Oferta actual: 
+                                    {% if subasta.ofertaActual > 0 %}
+                                        ${{ subasta.ofertaActual }}
+                                    {% else %}
+                                        ${{ subasta.ofertaInicial }}
+                                    {% endif %}
+                                </h6>
                             </div>
                         </a>
                     </div>

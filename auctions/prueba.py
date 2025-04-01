@@ -19,5 +19,3 @@ while num!=-1:
     break
 
 
-print(lista)
-print(lista2)

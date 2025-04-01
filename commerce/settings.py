@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 from pathlib import Path
 
+TIME_ZONE = 'America/Argentina/Buenos_Aires'  # Ajusta según tu ubicación
+USE_TZ = True  # Mantener habilitada la zona horaria
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Include where to save files
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -72,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'auctions.context_processors.seguidos_context',
             ],
         },
     },
@@ -84,11 +88,16 @@ WSGI_APPLICATION = 'commerce.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+       'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'auctions',
+        'USER': 'postgres',
+        'PASSWORD': 'Umaunauma9',
+        'HOST': 'localhost',  # O la IP del servidor
+        'PORT': '5432',
     }
 }
+
 
 AUTH_USER_MODEL = 'auctions.User'
 
@@ -129,6 +138,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "auctions", "static"),
+]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

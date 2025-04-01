@@ -1,35 +1,22 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django import forms
 from django.contrib import messages
+import json
 
 
-from . forms import Crear, ComentariosForm, Categoria
 
-from . models import Subastas, Oferta, SeguimientoSubasta, User, Comentarios
+
+from . forms import Crear, ComentariosForm, Categoria, OfertaForm
+
+from . models import Subastas, Oferta, SeguimientoSubasta, User, Comentarios, SubastaFinalizada
 
 
 from .models import User
-
-
-def index(request, categoria=None):
-
-    if categoria and categoria != 'todos':
-        subastas = Subastas.objects.filter(activa=True, categoria=categoria)
-    else:
-        subastas = Subastas.objects.filter(activa=True)
-
-    form = Categoria(initial={'categoria': categoria or 'todos'})  # Si no hay categoría, usar 'todos'
-    print (subastas)
-    return render(request, "auctions/index.html", 
-                  {
-        "subastas": subastas,
-        "form": form
-      })
 
 
 def login_view(request):
@@ -83,7 +70,31 @@ def register(request):
         return redirect(next_url)
     else:
         return render(request, "auctions/register.html")
+    
 
+
+
+
+
+def index(request, categoria=None):
+
+    if categoria and categoria != 'todos':
+        subastas = Subastas.objects.filter(activa=True, categoria=categoria)
+    else:
+        subastas = Subastas.objects.filter(activa=True)
+
+   
+    
+        
+    
+
+    form = Categoria(initial={'categoria': categoria or 'todos'})  # Si no hay categoría, usar 'todos'
+    
+    return render(request, "auctions/index.html", 
+                  {
+        "form": form,
+        "subastas": subastas,
+      })
 
 
 @login_required
@@ -94,12 +105,20 @@ def createListing(request):
         form = Crear(request.POST, request.FILES)  # chequea toda la data que se subio en el form y la guarda en la variable form 
 
         if form.is_valid():
-            form.save() #Guarda automaticamente los datos que se envien al formulario, en el campo del model correspondiente especificado en el form
+            
+            
+            subasta = form.save(commit=False) #Guarda una instancia temporal de los datos que se envien al formulario, en el campo del model correspondiente especificado en el form
+        
+            # Asignar el creador desde el usuario autenticado
+            subasta.creador = request.user
+            
+            # Guardar el objeto completo en la base de datos
+            subasta.save()
 
             return redirect('index')
         
         else:
-            print(form.errors)
+         
             return render(request, "auctions/createListing.html",  #si hay un error, se renferiza el archivo de nuevo con los errores 
                           {"form": form 
                            })
@@ -134,16 +153,26 @@ def bidLogic(_articulo, _ofertante, _oferta, _ofertaActual):
 def articleBid(request, subasta_id):
     nuevo_oferta = None
     nuevo_comentario = None
+    message = None
     boton = False
 
-    #Recupera el mensaje especifico para la subasta
-    message_key = f'tracking_message_{subasta_id}'
-    
-    message = request.session.get(message_key, "Añadir a lista de seguimiento")
+    seguidos=SeguimientoSubasta.objects.filter(subasta_id=subasta_id, user=request.user)
+
+    for seguido in seguidos:
+        
+        if seguido and seguido.esta_seguido==True:
+            message= "Remover de la lista de seguimiento"
+        else: message = "Añadir a lista de seguimiento"
+
+    ofertaForm = OfertaForm(request.POST)
+    if ofertaForm.is_valid():
+        ofertaValida = ofertaForm.cleaned_data["oferta"]
+
 
     form = ComentariosForm(request.POST)
 
     articulo = Subastas.objects.get(pk=subasta_id)
+
     oferta = Oferta.objects.filter(articulo=articulo).order_by('-ofertaActual').first()  # Busca la oferta más reciente
 
     if articulo.creador == request.user:
@@ -156,39 +185,54 @@ def articleBid(request, subasta_id):
         ofertaActual = articulo.ofertaInicial
         ofertanteActual = "No hay ofertas"
 
-     # Obtener todos los comentarios relacionados con la subasta
+
+
+    # Definir el formulario con la oferta actual + 10
+    oferta_form = OfertaForm(request.POST or None, ofertaActual=ofertaActual)
+
     comentariosList = Comentarios.objects.filter(articulo=articulo).order_by('-id')[:3]
 
+    
     if request.method == "POST":
-        
-        oferta = int(request.POST["ofertar"])  # Obtiene el valor ofertado
-        ofertante = request.user
-        
-        if bidLogic(articulo, request.user, oferta, ofertaActual): # valida que la oferta sea 10$ >
-            return redirect('articleBid', subasta_id=subasta_id)  # Redirige a la misma página
+        if ofertaForm.is_valid():
+            ofertaValida = ofertaForm.cleaned_data["oferta"]
+            ofertante = request.user
 
-        else: 
-            #muestra mensaje de error
-            return render(request, "auctions/articleBid.html", {
-                "oferta": ofertaActual,
-                "articulo": articulo,
-                "ofertante": ofertanteActual,
-                "errorMessage": "La oferta debe ser al menos $10 mayor a la anterior.",
-                "boton": boton,
-                "form": form,
-                "comentariosList": comentariosList,
-                "message": message,
-            })
+            # Lógica de validación de la oferta
+            if ofertaValida >= (ofertaActual + 10):  # Asegúrate de que la oferta sea mayor o igual a ofertaActual + 10
+                nuevo_oferta = Oferta(articulo=articulo, ofertaActual=ofertaValida, ofertanteActual=ofertante)
+                articulo.ofertaActual = ofertaValida
 
+                # Guarda la nueva oferta y el artículo
+                nuevo_oferta.save()
+                articulo.save()
+
+                return redirect('articleBid', subasta_id=subasta_id)  # Redirige si la oferta es válida
+            else:
+                # Si la oferta no es válida, muestra un mensaje de error
+                return render(request, "auctions/articleBid.html", {
+                    "oferta": ofertaActual,
+                    "articulo": articulo,
+                    "ofertante": ofertanteActual,
+                    "errorMessage": "La oferta debe ser al menos $10 mayor a la anterior.",
+                    "boton": boton,
+                    "form": form,
+                    "ofertaForm": ofertaForm,
+                    "comentariosList": comentariosList,
+                    "message": message or "Añadir a lista de seguimiento",
+                })
 
     return render(request, "auctions/articleBid.html", {
         "articulo": articulo,
         "oferta": ofertaActual,
         "ofertante": ofertanteActual,
-        "message": message,
+        "message": message if message else "Añadir a lista de seguimiento",
         "boton": boton, 
         "form": form,
-        "comentariosList": comentariosList
+        "comentariosList": comentariosList,
+        "inicio": articulo.start_time,
+        "finalizacion": articulo.end_time,
+        "ofertaForm": ofertaForm,  # Asegúrate de pasar el formulario a la plantilla
     })
 
 
@@ -197,46 +241,33 @@ def trackingList(request, subasta_id):
     nuevo_seguimiento = None
     usuario= request.user #guarde el id del usuario
     subasta = Subastas.objects.get(pk=subasta_id)
-    message="Remover de lista de seguimiento" 
+     
 
     if request.method == "POST":
 
         try:
             seguimiento = SeguimientoSubasta.objects.get(user=usuario, subasta=subasta) #Comprueba si el articulo esta en lista de seguimiento
 
-            
             if (seguimiento.esta_seguido == True):
-                message = "Añadir a lista de seguimiento"
                 seguimiento.esta_seguido = False
-                
-
             else:
-
-                message = "Remover de lista de seguimiento" 
                 seguimiento.esta_seguido = True
             
             seguimiento.save()    
-        
                 
         except SeguimientoSubasta.DoesNotExist:
 
             seguimiento = SeguimientoSubasta(user=usuario, subasta=subasta, esta_seguido=True) #Sino esta, lo crea
             seguimiento.save()
 
-        
-        # Guardar el estado del mensaje en la sesión para la subasta específica
-        # Crea un diccionario donde guarda el valor del mensaje
-        request.session[f'tracking_message_{subasta_id}'] = message 
-
     return redirect('articleBid', subasta_id=subasta_id)
-
-        
-
+                
 
 def deleteView (request, subasta_id):
     articulo = Subastas.objects.get(pk=subasta_id)
-    ofertaActual = Oferta.objects.filter(articulo=articulo).order_by('-ofertaActual').first() 
-    ofertanteActual = ofertaActual.ofertanteActual
+    ofertaActual = Oferta.objects.filter(articulo=articulo).order_by('-ofertaActual').first()
+    """oferta = ofertaActual or articulo.ofertaInicial
+    ofertanteActual = ofertaActual.ofertanteActual """
 
     if request.method == "POST":
         
@@ -269,7 +300,7 @@ def whatchlist (request):
         subasta = Subastas.objects.get(pk=seguimiento.subasta_id)
         subastas.append(subasta)
         
-    print (subastas)
+
     return render(request, "auctions/whatchlist.html", 
     
     
@@ -286,8 +317,35 @@ def filterByCategory(request):
         return redirect('indexFiltrado', categoria=eleccionCategoria)
 
 
+def endBid(request):
+    if request.method == "POST":
 
-   
+        try:
+            data = json.loads(request.body)
+            articuloId = data.get("articuloId")
+            subasta = Subastas.objects.get (pk=articuloId) 
+            oferta = Oferta.objects.filter(articulo=subasta).order_by('-ofertaActual').first()
+            montoFinal = oferta.ofertaActual
+            ganador = oferta.ofertanteActual
+
+            if not montoFinal:
+
+                return JsonResponse({"error": "No se encontraron ofertas para esta subasta"}, status=404)
+
+
+            subasta.activa=False
+
+            subasta.save()
+
+            nuevaSubastaFinalizada = SubastaFinalizada(monto=montoFinal, articulo = subasta, ganador = ganador)
+            nuevaSubastaFinalizada.save()
+            
+            return JsonResponse({"message": "Subasta finalizada"}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Error en el formato del JSON"}, status=400)
+        
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
 
  
        
@@ -295,7 +353,7 @@ def filterByCategory(request):
 
 
 
-    
+ 
          
 
 

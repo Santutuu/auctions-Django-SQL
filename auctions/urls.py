@@ -5,7 +5,7 @@ from django.conf import settings
 
 
 urlpatterns = [
-    path ('admin/', admin.site.urls),
+    
     path("", views.index, name="index"),
     path('categoria/<str:categoria>/', views.index, name='indexFiltrado'),
     path("login", views.login_view, name="login"),
@@ -18,5 +18,6 @@ urlpatterns = [
     path("<int:subasta_id>/comentarios/", views.comments, name="comments"),
     path("whatchlist", views.whatchlist, name="whatchlist"),
     path("filterByCategory", views.filterByCategory, name="filter"),
+    path("endBid/", views.endBid, name="endBid"),
 
 ] 

@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.timezone import now
+from datetime import timedelta
 
 
 class User(AbstractUser):
@@ -15,6 +17,7 @@ class Subastas(models.Model):
     CATEGORIAS = [
         ('futbolistas', 'Futbolistas'),
         ('articulosLimpieza', 'Artículos de Limpieza'),
+        ('Accesorios', 'Accesorios y joyas')
         
         
     ]
@@ -27,10 +30,24 @@ class Subastas(models.Model):
     activa =  models.BooleanField(default=True)
     ofertaActual= models.IntegerField(default=0)
     categoria = models.CharField(max_length=50, choices=CATEGORIAS, default='futbolistas')
+    start_time = models.DateTimeField(default=now)
+    
+    
+    def default_end_time():
+        return now() + timedelta(days=1)
 
+    end_time = models.DateTimeField(default=default_end_time)
     def __str__(self):
         return f"{self.titulo} || oferta inicial: {self.ofertaInicial}::{self.descripcion}"
     
+class SubastaFinalizada(models.Model):
+    articulo = models.ForeignKey(Subastas, on_delete=models.DO_NOTHING)
+    ganador = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    monto = models.IntegerField()
+    fechaFinalizacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Subasta {self.subasta.id} - {self.ganador.username}"
 
 
 class Comentarios(models.Model):
